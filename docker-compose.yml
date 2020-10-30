@@ -1,0 +1,27 @@
+version: '3'
+services:
+   nginx:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+    volumes:
+        - /var/run/docker.sock:/tmp/docker.sock:ro
+
+        # Make sure that 'SCRIPT_FILENAME' is passed to fpm.
+        - ./fpm_workaround_location.conf:/etc/nginx/vhost.d/example.local.guys.wtf_location:ro
+
+        # Additionally serve non-php files statically from /var/www/$server_name/.
+        # We need to mount the static files into the nginx-proxy container for this. 
+        # If you don't need static files, these two lines can be removed. 
+        - ./fpm_workaround_static.conf:/etc/nginx/vhost.d/example.local.guys.wtf:ro
+        - ./html:/var/www/example.local.guys.wtf/
+
+   php:
+    image:  php:fpm
+    environment:
+      VIRTUAL_HOST: example.local.guys.wtf
+      VIRTUAL_PROTO: fastcgi
+      VIRTUAL_PORT: 9000
+      VIRTUAL_ROOT: /var/www/html
+    volumes:
+      - ./html:/var/www/html

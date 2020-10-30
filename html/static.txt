@@ -1,0 +1,2 @@
+This is a static file. 
+This should not be evaluated: <?php echo "You should see quotes and tags around this string"; ?>
